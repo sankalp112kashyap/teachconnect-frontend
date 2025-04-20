@@ -4,6 +4,7 @@ import { useAuth } from './hooks/useAuth';
 import { useUserRole } from './hooks/useUserRole';
 
 import MainLayout from './layouts/MainLayout';
+import AuthLayout from './layouts/AuthLayout';
 
 // Auth Pages
 import Login from './pages/Auth/Login';
@@ -68,14 +69,6 @@ export const router = createBrowserRouter([
         element: <Navigate to="/home" replace />,
       },
       {
-        path: '/login',
-        element: <Login />,
-      },
-      {
-        path: '/register',
-        element: <Register />,
-      },
-      {
         path: '/complete-student-profile',
         element: <ProtectedRoute element={<StudentProfile />} />,
       },
@@ -98,6 +91,20 @@ export const router = createBrowserRouter([
       {
         path: '*',
         element: <Navigate to="/home" replace />,
+      },
+    ],
+  },
+  {
+    path: '/',
+    element: <AuthLayout />,
+    children: [
+      {
+        path: '/login',
+        element: <Login />,
+      },
+      {
+        path: '/register',
+        element: <Register />,
       },
     ],
   },
