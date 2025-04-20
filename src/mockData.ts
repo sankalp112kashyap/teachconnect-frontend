@@ -235,3 +235,23 @@ export const mockStudentRequests: ClassRequest[] = [
     studentsRequested: 5,
   },
 ];
+
+// Mock users
+export const users = [
+  {
+    id: 'student1',
+    firstName: 'John',
+    lastName: 'Doe',
+    email: 'student@example.com',
+    role: 'student'
+  },
+  {
+    id: 'tutor1',
+    firstName: 'Evelyn',
+    lastName: 'Reed',
+    email: 'tutor@example.com',
+    profilePicture: undefined,
+    rating: 4.9,
+    role: 'tutor'
+  }
+];

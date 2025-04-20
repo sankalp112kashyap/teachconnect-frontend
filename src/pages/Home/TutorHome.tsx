@@ -186,18 +186,20 @@ const TutorHome: React.FC = () => {
           </div>
         ) : upcomingClasses.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {upcomingClasses.map((classItem) => (
-              <ClassCard
-                key={classItem.id}
-                title={classItem.title}
-                description={classItem.description}
-                instructor={`${classItem.tutor.firstName} ${classItem.tutor.lastName}`}
-                schedule={new Date(classItem.dateTime).toLocaleString()}
-                capacity={30} // Mock value
-                enrolled={classItem.enrolledStudents.length}
-                onEnroll={() => handleManageClass(classItem.id)}
-              />
-            ))}
+          {upcomingClasses.map((classItem) => (
+            <ClassCard
+              key={classItem.id}
+              title={classItem.title}
+              description={classItem.description}
+              // Not passing instructor prop when in instructor view
+              schedule={new Date(classItem.dateTime).toLocaleString()}
+              capacity={30} // Mock value
+              enrolled={classItem.enrolledStudents.length}
+              onEnroll={() => handleManageClass(classItem.id)}
+              buttonText="Manage Class" // Custom button text for tutor view
+              isInstructorView={true} // Set to true for tutor view
+            />
+          ))}
           </div>
         ) : (
           <div className="bg-white p-6 rounded-lg border border-gray-200 text-center">
