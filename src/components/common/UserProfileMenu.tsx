@@ -2,7 +2,6 @@ import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useUserRole } from '../../hooks/useUserRole';
-import Avatar from './Avatar';
 
 const UserProfileMenu: React.FC = () => {
   const { user, logout } = useAuth();
@@ -43,7 +42,7 @@ const UserProfileMenu: React.FC = () => {
 
   if (!user) return null;
 
-  const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`;
+  const initials = user.name ? user.name.charAt(0).toUpperCase() : 'U';
 
   return (
     <div className="relative" ref={menuRef}>
@@ -51,13 +50,10 @@ const UserProfileMenu: React.FC = () => {
         className="flex items-center text-sm focus:outline-none"
         onClick={toggleMenu}
       >
-        <Avatar
-          src={user.profilePicture}
-          initials={initials}
-          size="sm"
-          className="mr-1"
-        />
-        <span className="hidden md:block">{user.firstName}</span>
+        <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white font-semibold mr-2">
+          {initials}
+        </div>
+        <span className="hidden md:block">{user.name}</span>
         <svg
           className="ml-1 h-5 w-5 text-gray-400"
           viewBox="0 0 20 20"
@@ -75,33 +71,31 @@ const UserProfileMenu: React.FC = () => {
         <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
           <div className="px-4 py-2 border-b">
             <p className="text-sm font-medium text-gray-900">
-              {user.firstName} {user.lastName}
+              {user.name}
             </p>
             <p className="text-xs text-gray-500 truncate">{user.email}</p>
             <p className="text-xs text-gray-500 truncate capitalize">
               {activeRole} Role
             </p>
           </div>
-          <a
-            href="#"
-            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+          <button
+            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             onClick={() => {
               setIsOpen(false);
               navigate('/profile');
             }}
           >
             Your Profile
-          </a>
-          <a
-            href="#"
-            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+          </button>
+          <button
+            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             onClick={() => {
               setIsOpen(false);
               handleLogout();
             }}
           >
             Sign out
-          </a>
+          </button>
         </div>
       )}
     </div>

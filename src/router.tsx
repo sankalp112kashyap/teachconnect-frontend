@@ -22,6 +22,9 @@ import ClassDetails from './pages/Class/ClassDetails';
 // Search Pages
 import SearchResults from './pages/Search/SearchResults';
 
+// Profile Pages
+import Profile from './pages/Profile/Profile';
+
 // Protected route component
 const ProtectedRoute: React.FC<{ 
   element: React.ReactElement; 
@@ -79,6 +82,10 @@ export const router = createBrowserRouter([
       {
         path: '/home',
         element: <ProtectedRoute element={<HomeRedirect />} />,
+      },
+      {
+        path: '/profile',
+        element: <ProtectedRoute element={<Profile />} />,
       },
       {
         path: '/class/:id',
