@@ -28,48 +28,7 @@ const ClassRequestModal: React.FC<ClassRequestModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!user) {
-      setError('You must be logged in to request a class');
-      return;
-    }
-    
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const requestData = {
-        topic: formData.title,
-        subject: formData.subject,
-        level: formData.level,
-        preferredDate: formData.preferredDate,
-        requestedBy: [user.id],
-      };
-      
-      // In a real app, this would call your API
-      console.log('Creating class request:', requestData);
-      // await createClassRequest(requestData);
-      
-      // Success
-      if (onSuccess) {
-        onSuccess(requestData);
-      }
-      onClose();
-    } catch (error) {
-      console.error('Failed to create class request:', error);
-      setError('Failed to create class request. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  // Define subjects at component level so it can be used in both handleSubmit and render
   const subjects = [
     { value: 'mathematics', label: 'Mathematics' },
     { value: 'physics', label: 'Physics' },
@@ -88,6 +47,58 @@ const ClassRequestModal: React.FC<ClassRequestModalProps> = ({
     { value: 'graduate', label: 'Graduate' },
     { value: 'postgraduate', label: 'Postgraduate' },
   ];
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!user) {
+      setError('You must be logged in to request a class');
+      return;
+    }
+    
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      // Create a new class request object that matches ClassRequest interface
+      const requestData = {
+        id: `request_${Date.now()}`, // Generate a temporary ID
+        topic: formData.title,
+        subject: {
+          id: formData.subject,
+          name: subjects.find(s => s.value === formData.subject)?.label.toUpperCase() || formData.subject.toUpperCase(),
+          color: 'green-600',
+          topics: [],
+          level: []
+        },
+        requestedBy: [user.id],
+        // Use today's date if no preferredDate is provided
+        dateRequested: formData.preferredDate ? new Date(formData.preferredDate) : new Date(),
+        studentsRequested: 1, // Start with 1 student (the current user)
+        level: formData.level // Education level to display in the card
+      };
+      
+      // In a real app, this would call your API
+      console.log('Creating class request:', requestData);
+      // await createClassRequest(requestData);
+      
+      // Success
+      if (onSuccess) {
+        onSuccess(requestData);
+      }
+      onClose();
+    } catch (error) {
+      console.error('Failed to create class request:', error);
+      setError('Failed to create class request. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <Modal
