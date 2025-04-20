@@ -97,16 +97,6 @@ const UserProfileMenu: React.FC = () => {
             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             onClick={() => {
               setIsOpen(false);
-              navigate('/settings');
-            }}
-          >
-            Settings
-          </a>
-          <a
-            href="#"
-            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-            onClick={() => {
-              setIsOpen(false);
               handleLogout();
             }}
           >
