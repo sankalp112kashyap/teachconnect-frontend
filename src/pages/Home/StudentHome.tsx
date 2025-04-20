@@ -12,7 +12,13 @@ import ClassCard from '../../components/class/ClassCard';
 import ClassRequestCard from '../../components/class/ClassRequestCard';
 import DiscoverClassCard from '../../components/class/DiscoverClassCard';
 import { Class, ClassRequest } from '../../models/class';
-
+import { 
+    mockUpcomingClasses, 
+    mockClassRequests, 
+    mockMathClasses, 
+    mockCSClasses 
+  } from '../../mockData';
+  
 const StudentHome: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -38,14 +44,25 @@ const StudentHome: React.FC = () => {
   ]);
 
   useEffect(() => {
-    // Same initialization code as before...
+    // Set mock data instead of calling APIs
+    setUpcomingClasses(mockUpcomingClasses);
+    setClassRequests(mockClassRequests);
     
-    // Fetch data code...
-
-    // Uncomment to fetch actual data from API
+    // Group discover classes by subject
+    setDiscoverSections([
+      { id: 'mathematics', name: 'Mathematics', classes: mockMathClasses },
+      { id: 'computer_science', name: 'Computer Science', classes: mockCSClasses },
+    ]);
+    
+    setLoading({
+      upcoming: false,
+      requests: false,
+      discover: false,
+    });
+    
+    // Uncomment when backend is ready
     // fetchData();
   }, [user]);
-
   const handleRequestClass = () => {
     navigate('/request-class');
   };
