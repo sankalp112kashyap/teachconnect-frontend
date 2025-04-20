@@ -1,16 +1,16 @@
 // src/pages/Home/TutorHome.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  getUpcomingClasses, 
-  getClassRequests
+import {
+  getTutorClasses,
+  getTutorClassRequests,
+  createClass
 } from '../../services/class.service';
 import { useAuth } from '../../hooks/useAuth';
-import Button from '../../components/common/Button';
 import ClassCard from '../../components/class/ClassCard';
 import ClassRequestCard from '../../components/class/ClassRequestCard';
 import ClassCreateForm from '../../components/class/ClassCreateForm';
-import { Class, ClassRequest } from '../../models/class';
+import { Class, ClassRequest, RequestStatus } from '../../models/class';
 
 const TutorHome: React.FC = () => {
   const { user } = useAuth();
@@ -23,29 +23,23 @@ const TutorHome: React.FC = () => {
     requests: true,
   });
   const [error, setError] = useState<string | null>(null);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState<{
-    id: string;
-    subject: string;
-    topic: string;
-  } | null>(null);
+  const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!user) return;
-
       try {
-        // Fetch upcoming classes
-        const upcomingData = await getUpcomingClasses(user.id);
-        setUpcomingClasses(upcomingData);
+        // Fetch upcoming classes for tutor
+        setLoading(prev => ({ ...prev, upcoming: true }));
+        const classesData = await getTutorClasses();
+        setUpcomingClasses(classesData);
         setLoading(prev => ({ ...prev, upcoming: false }));
 
-        // Fetch class requests
-        const requestsData = await getClassRequests();
+        // Fetch class requests assigned to this tutor
+        setLoading(prev => ({ ...prev, requests: true }));
+        const requestsData = await getTutorClassRequests();
         setClassRequests(requestsData);
         setLoading(prev => ({ ...prev, requests: false }));
-      } catch (error) {
-        console.error('Error fetching data:', error);
+      } catch (err) {
         setError('Failed to load data. Please try again later.');
         setLoading({
           upcoming: false,
@@ -54,106 +48,44 @@ const TutorHome: React.FC = () => {
       }
     };
 
-    // Use mock data for development
-    setUpcomingClasses([
-      {
-        id: '1',
-        subject: { id: 'mathematics', name: 'MATHEMATICS', color: 'indigo-600', topics: [], level: [] },
-        topic: 'Introduction to Derivatives',
-        title: 'Introduction to Derivatives',
-        description: 'Understanding the concept of limits and the formal definition of a derivative. Basic differentiation rules and applications.',
-        tutor: {
-          id: 'tutor1',
-          firstName: 'Evelyn',
-          lastName: 'Reed',
-          profilePicture: undefined,
-          rating: 4.9,
-        },
-        dateTime: new Date('2025-04-21T11:00:00'),
-        duration: 60,
-        status: 'scheduled',
-        enrolledStudents: ['student1'],
-      },
-      {
-        id: '3',
-        subject: { id: 'physics', name: 'PHYSICS', color: 'indigo-600', topics: [], level: [] },
-        topic: 'Newton\'s Laws of Motion',
-        title: 'Newton\'s Laws of Motion',
-        description: 'Exploring inertia, force, acceleration, and action-reaction through examples and demonstrations.',
-        tutor: {
-          id: 'tutor3',
-          firstName: 'Anita',
-          lastName: 'Sharma',
-          profilePicture: undefined,
-          rating: 5.0,
-        },
-        dateTime: new Date('2025-04-23T09:00:00'),
-        duration: 60,
-        status: 'scheduled',
-        enrolledStudents: ['student1'],
-      },
-    ]);
+    fetchData();
+  }, []);
 
-    setClassRequests([
-      {
-        id: '1',
-        subject: { id: 'computer_science', name: 'COMPUTER SCIENCE', color: 'green-600', topics: [], level: [] },
-        topic: 'Understanding Recursion',
-        requestedBy: [],
-        dateRequested: new Date('2025-04-18'),
-        studentsRequested: 7,
-      },
-      {
-        id: '2',
-        subject: { id: 'chemistry', name: 'CHEMISTRY', color: 'green-600', topics: [], level: [] },
-        topic: 'Organic Reaction Mechanisms',
-        requestedBy: [],
-        dateRequested: new Date('2025-04-17'),
-        studentsRequested: 12,
-      },
-      {
-        id: '3',
-        subject: { id: 'philosophy', name: 'PHILOSOPHY', color: 'green-600', topics: [], level: [] },
-        topic: 'Introduction to Ethics',
-        requestedBy: [],
-        dateRequested: new Date('2025-04-19'),
-        studentsRequested: 3,
-      },
-    ]);
-
-    setLoading({
-      upcoming: false,
-      requests: false,
-    });
-
-    // Uncomment to fetch actual data from API
-    // fetchData();
-  }, [user]);
-
-  const handleCreateClass = () => {
-    setSelectedRequest(null);
-    setIsCreateModalOpen(true);
-  };
-
-  const handleCreateFromRequest = (requestId: string) => {
-    const request = classRequests.find((req) => req.id === requestId);
-    if (request) {
-      setSelectedRequest({
-        id: request.id,
-        subject: request.subject.id,
-        topic: request.topic,
+  const handleCreateClass = async (classData: any) => {
+    try {
+      const newClass = await createClass({
+        ...classData,
+        tutorId: user?.id
       });
-      setIsCreateModalOpen(true);
+      
+      // Add the new class to the list
+      setUpcomingClasses(prev => [...prev, newClass]);
+      
+      // Close the form
+      setIsCreateFormOpen(false);
+    } catch (err) {
+      setError('Failed to create class. Please try again.');
     }
   };
 
-  const handleCloseModal = () => {
-    setIsCreateModalOpen(false);
-    setSelectedRequest(null);
-  };
-
-  const handleManageClass = (classId: string) => {
-    navigate(`/class/${classId}/manage`);
+  const handleClassRequest = (requestId: string, approve: boolean) => {
+    // Update the request status
+    const updatedRequests = classRequests.map(request => {
+      if (request.id === requestId) {
+        return {
+          ...request,
+          status: (approve ? 'approved' : 'rejected') as RequestStatus
+        };
+      }
+      return request;
+    });
+    
+    setClassRequests(updatedRequests);
+    
+    // If approved, you could also create a new class based on the request
+    if (approve) {
+      // Implementation would depend on your application flow
+    }
   };
 
   if (error) {
@@ -168,50 +100,56 @@ const TutorHome: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      {/* My Upcoming Classes Section */}
+      {/* Scheduled Classes Section */}
       <section className="mb-12">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">My Upcoming Classes</h2>
-          <Button
-            variant="primary"
-            onClick={handleCreateClass}
+          <h2 className="text-2xl font-bold text-gray-900">Scheduled Classes</h2>
+          <button
+            className="bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700"
+            onClick={() => setIsCreateFormOpen(!isCreateFormOpen)}
           >
-            + Create New Class
-          </Button>
+            {isCreateFormOpen ? 'Cancel' : '+ Create New Class'}
+          </button>
         </div>
+        
+        {isCreateFormOpen && (
+          <div className="mb-8">
+            <ClassCreateForm onSubmit={handleCreateClass} />
+          </div>
+        )}
         
         {loading.upcoming ? (
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
           </div>
         ) : upcomingClasses.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {upcomingClasses.map((classItem) => (
               <ClassCard
                 key={classItem.id}
                 title={classItem.title}
                 description={classItem.description}
-                instructor={`${classItem.tutor.firstName} ${classItem.tutor.lastName}`}
+                instructor={`${classItem.tutor?.firstName || 'You'} ${classItem.tutor?.lastName || ''}`}
                 schedule={new Date(classItem.dateTime).toLocaleString()}
-                capacity={30} // Mock value
-                enrolled={classItem.enrolledStudents.length}
-                onEnroll={() => handleManageClass(classItem.id)}
+                capacity={classItem.capacity}
+                enrolled={classItem.enrolledStudents?.length || 0}
+                onEnroll={() => navigate(`/class/${classItem.id}`)}
               />
             ))}
           </div>
         ) : (
           <div className="bg-white p-6 rounded-lg border border-gray-200 text-center">
-            <p className="text-gray-600">You haven't created any classes yet.</p>
+            <p className="text-gray-600">You haven't scheduled any classes yet.</p>
             <p className="text-gray-600 mt-2">
-              Click the "Create New Class" button to get started!
+              Click the "Create New Class" button to get started.
             </p>
           </div>
         )}
       </section>
       
-      {/* Student Class Requests Section */}
+      {/* Class Requests Section */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Student Class Requests</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Class Requests</h2>
         
         {loading.requests ? (
           <div className="flex justify-center items-center h-64">
@@ -219,39 +157,31 @@ const TutorHome: React.FC = () => {
           </div>
         ) : classRequests.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {classRequests.map((request) => (
+            {classRequests.map((requestItem) => (
               <ClassRequestCard
-                key={request.id}
+                key={requestItem.id}
                 request={{
-                  id: request.id,
-                  studentName: "Student", // Mock value
-                  studentEmail: "student@example.com", // Mock value
-                  className: request.topic,
-                  requestDate: new Date(request.dateRequested).toLocaleDateString(),
-                  status: "pending" as "pending" | "approved" | "rejected"
+                  id: requestItem.id,
+                  studentName: requestItem.studentName || 'Student',
+                  studentEmail: requestItem.studentEmail || 'student@example.com',
+                  className: requestItem.className || '',
+                  requestDate: requestItem.dateRequested,
+                  status: requestItem.status
                 }}
-                onApprove={() => handleCreateFromRequest(request.id)}
-                onReject={() => console.log('Reject request:', request.id)}
+                onApprove={() => handleClassRequest(requestItem.id, true)}
+                onReject={() => handleClassRequest(requestItem.id, false)}
               />
             ))}
           </div>
         ) : (
           <div className="bg-white p-6 rounded-lg border border-gray-200 text-center">
-            <p className="text-gray-600">No student requests available.</p>
+            <p className="text-gray-600">No class requests available.</p>
             <p className="text-gray-600 mt-2">
-              Students haven't requested any classes yet. Check back later!
+              Students will send requests for classes they'd like you to teach.
             </p>
           </div>
         )}
       </section>
-      
-      {/* Create Class Modal */}
-      <ClassCreateForm
-        onSubmit={(classData) => {
-          console.log('Creating class:', classData);
-          handleCloseModal();
-        }}
-      />
     </div>
   );
 };

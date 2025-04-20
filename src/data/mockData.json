@@ -1,0 +1,300 @@
+{
+  "users": [
+    {
+      "id": "user1",
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "john.doe@example.com",
+      "role": "student",
+      "profileImage": "https://randomuser.me/api/portraits/men/1.jpg"
+    },
+    {
+      "id": "user2",
+      "firstName": "Jane",
+      "lastName": "Smith",
+      "email": "jane.smith@example.com",
+      "role": "tutor",
+      "profileImage": "https://randomuser.me/api/portraits/women/2.jpg",
+      "rating": 4.8,
+      "bio": "Experienced math tutor with 5+ years of teaching experience",
+      "subjects": ["mathematics", "physics"]
+    },
+    {
+      "id": "user3",
+      "firstName": "Michael",
+      "lastName": "Johnson",
+      "email": "michael.johnson@example.com",
+      "role": "tutor",
+      "profileImage": "https://randomuser.me/api/portraits/men/3.jpg",
+      "rating": 4.5,
+      "bio": "Computer Science professor with expertise in programming and algorithms",
+      "subjects": ["computer_science", "data_structures", "algorithms"]
+    },
+    {
+      "id": "user4",
+      "firstName": "Sarah",
+      "lastName": "Williams",
+      "email": "sarah.williams@example.com",
+      "role": "student",
+      "profileImage": "https://randomuser.me/api/portraits/women/4.jpg"
+    }
+  ],
+  "subjects": [
+    {
+      "id": "subj1",
+      "name": "Mathematics",
+      "slug": "mathematics",
+      "image": "https://images.unsplash.com/photo-1635070041078-e363dbe005cb"
+    },
+    {
+      "id": "subj2",
+      "name": "Computer Science",
+      "slug": "computer_science",
+      "image": "https://images.unsplash.com/photo-1555066931-4365d14bab8c"
+    },
+    {
+      "id": "subj3",
+      "name": "Physics",
+      "slug": "physics",
+      "image": "https://images.unsplash.com/photo-1636466497217-26a42372b16e"
+    },
+    {
+      "id": "subj4",
+      "name": "English Literature",
+      "slug": "english_literature",
+      "image": "https://images.unsplash.com/photo-1515592302748-6c5ea17e2f0e"
+    }
+  ],
+  "upcomingClasses": [
+    {
+      "id": "class1",
+      "title": "Calculus Fundamentals",
+      "description": "Learn the fundamentals of calculus including limits, derivatives, and integrals.",
+      "tutor": {
+        "id": "user2",
+        "firstName": "Jane",
+        "lastName": "Smith",
+        "email": "jane.smith@example.com",
+        "rating": 4.8
+      },
+      "dateTime": "2023-12-10T14:00:00Z",
+      "duration": 90,
+      "subject": {
+        "id": "subj1",
+        "name": "Mathematics"
+      },
+      "level": "intermediate",
+      "capacity": 30,
+      "enrolledStudents": [
+        {"id": "user1", "firstName": "John", "lastName": "Doe"},
+        {"id": "user4", "firstName": "Sarah", "lastName": "Williams"}
+      ],
+      "materials": ["Calculus textbook", "Scientific calculator"],
+      "prerequisites": ["Algebra", "Basic understanding of functions"]
+    },
+    {
+      "id": "class2",
+      "title": "Introduction to Python Programming",
+      "description": "A beginner-friendly course to learn Python programming from scratch.",
+      "tutor": {
+        "id": "user3",
+        "firstName": "Michael",
+        "lastName": "Johnson",
+        "email": "michael.johnson@example.com",
+        "rating": 4.5
+      },
+      "dateTime": "2023-12-12T18:00:00Z",
+      "duration": 120,
+      "subject": {
+        "id": "subj2",
+        "name": "Computer Science"
+      },
+      "level": "beginner",
+      "capacity": 25,
+      "enrolledStudents": [
+        {"id": "user1", "firstName": "John", "lastName": "Doe"}
+      ],
+      "materials": ["Python 3 installed on your computer", "Code editor (VS Code recommended)"],
+      "prerequisites": ["Basic computer knowledge"]
+    },
+    {
+      "id": "class3",
+      "title": "Advanced Algorithms",
+      "description": "Explore complex algorithms, data structures, and algorithmic techniques.",
+      "tutor": {
+        "id": "user3",
+        "firstName": "Michael",
+        "lastName": "Johnson",
+        "email": "michael.johnson@example.com",
+        "rating": 4.5
+      },
+      "dateTime": "2023-12-15T16:30:00Z",
+      "duration": 120,
+      "subject": {
+        "id": "subj2",
+        "name": "Computer Science"
+      },
+      "level": "advanced",
+      "capacity": 20,
+      "enrolledStudents": [
+        {"id": "user4", "firstName": "Sarah", "lastName": "Williams"}
+      ],
+      "materials": ["Laptop with Java/Python installed", "Algorithm textbook"],
+      "prerequisites": ["Data structures", "Basic algorithms"]
+    }
+  ],
+  "classRequests": [
+    {
+      "id": "req1",
+      "studentId": "user1",
+      "topic": "Machine Learning Basics",
+      "description": "I would like to understand the fundamentals of machine learning algorithms and their applications.",
+      "preferredSchedule": "Weekends, afternoons",
+      "preferredLevel": "intermediate",
+      "dateRequested": "2023-11-25T09:15:00Z",
+      "status": "pending"
+    },
+    {
+      "id": "req2",
+      "studentId": "user4",
+      "topic": "Advanced Physics: Quantum Mechanics",
+      "description": "Looking for classes on quantum mechanics principles and applications.",
+      "preferredSchedule": "Weekday evenings",
+      "preferredLevel": "advanced",
+      "dateRequested": "2023-11-28T14:30:00Z",
+      "status": "pending"
+    }
+  ],
+  "discoverClasses": {
+    "mathematics": [
+      {
+        "id": "disc1",
+        "title": "Linear Algebra Masterclass",
+        "description": "Master the concepts of vectors, matrices, and linear transformations in this comprehensive course.",
+        "tutor": {
+          "id": "user2",
+          "firstName": "Jane",
+          "lastName": "Smith",
+          "email": "jane.smith@example.com",
+          "rating": 4.8
+        },
+        "subject": {
+          "id": "subj1",
+          "name": "Mathematics"
+        },
+        "level": "intermediate",
+        "price": 49.99,
+        "imageUrl": "https://images.unsplash.com/photo-1635070041078-e363dbe005cb",
+        "reviewCount": 24
+      },
+      {
+        "id": "disc2",
+        "title": "Statistics for Data Science",
+        "description": "Learn statistical methods and concepts essential for data science and analytics.",
+        "tutor": {
+          "id": "user2",
+          "firstName": "Jane",
+          "lastName": "Smith",
+          "email": "jane.smith@example.com",
+          "rating": 4.8
+        },
+        "subject": {
+          "id": "subj1",
+          "name": "Mathematics"
+        },
+        "level": "intermediate",
+        "price": 59.99,
+        "imageUrl": "https://images.unsplash.com/photo-1551288049-bebda4e38f71",
+        "reviewCount": 18
+      }
+    ],
+    "computer_science": [
+      {
+        "id": "disc3",
+        "title": "Web Development Bootcamp",
+        "description": "Comprehensive course covering HTML, CSS, JavaScript, and modern frameworks.",
+        "tutor": {
+          "id": "user3",
+          "firstName": "Michael",
+          "lastName": "Johnson",
+          "email": "michael.johnson@example.com",
+          "rating": 4.5
+        },
+        "subject": {
+          "id": "subj2",
+          "name": "Computer Science"
+        },
+        "level": "beginner",
+        "price": 79.99,
+        "imageUrl": "https://images.unsplash.com/photo-1555066931-4365d14bab8c",
+        "reviewCount": 36
+      },
+      {
+        "id": "disc4",
+        "title": "Data Structures Deep Dive",
+        "description": "Advanced exploration of data structures with practical implementations.",
+        "tutor": {
+          "id": "user3",
+          "firstName": "Michael",
+          "lastName": "Johnson",
+          "email": "michael.johnson@example.com",
+          "rating": 4.5
+        },
+        "subject": {
+          "id": "subj2",
+          "name": "Computer Science"
+        },
+        "level": "advanced",
+        "price": 69.99,
+        "imageUrl": "https://images.unsplash.com/photo-1515879218367-8466d910aaa4",
+        "reviewCount": 15
+      }
+    ]
+  },
+  "tutorClasses": [
+    {
+      "id": "tclass1",
+      "title": "Calculus Fundamentals",
+      "description": "Learn the fundamentals of calculus including limits, derivatives, and integrals.",
+      "tutorId": "user2",
+      "dateTime": "2023-12-10T14:00:00Z",
+      "duration": 90,
+      "subjectId": "subj1",
+      "level": "intermediate",
+      "capacity": 30,
+      "enrolled": 2,
+      "status": "scheduled"
+    },
+    {
+      "id": "tclass2",
+      "title": "Differential Equations",
+      "description": "Understanding and solving differential equations and their applications.",
+      "tutorId": "user2",
+      "dateTime": "2023-12-17T15:00:00Z",
+      "duration": 90,
+      "subjectId": "subj1",
+      "level": "advanced",
+      "capacity": 20,
+      "enrolled": 0,
+      "status": "scheduled"
+    }
+  ],
+  "tutorRequests": [
+    {
+      "id": "treq1",
+      "studentName": "John Doe",
+      "studentEmail": "john.doe@example.com",
+      "className": "Machine Learning Basics",
+      "requestDate": "2023-11-25T09:15:00Z",
+      "status": "pending"
+    },
+    {
+      "id": "treq2",
+      "studentName": "Sarah Williams",
+      "studentEmail": "sarah.williams@example.com",
+      "className": "Advanced Physics: Quantum Mechanics",
+      "requestDate": "2023-11-28T14:30:00Z",
+      "status": "pending"
+    }
+  ]
+} 

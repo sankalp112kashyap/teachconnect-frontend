@@ -1,4 +1,5 @@
 // src/services/class.service.ts
+import mockData from '../data/mockData.json';
 import { Class, ClassRequest } from '../models/class';
 
 // Mock data initialization
@@ -218,53 +219,87 @@ const getDiscoverClassesData = (): Class[] => {
 };
 
 // Service functions
-export const getUpcomingClasses = async (userId: string): Promise<Class[]> => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  const classes = getUpcomingClassesData();
-  
-  // Filter classes where user is enrolled or is the tutor
-  return classes.filter(c => 
-    c.enrolledStudents.includes(userId) || c.tutor.id === userId
-  );
+export const getUpcomingClasses = async (): Promise<Class[]> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(mockData.upcomingClasses as Class[]);
+    }, 500); // Simulate network delay
+  });
 };
 
-export const getClassById = async (id: string): Promise<Class> => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  const allClasses = [
-    ...getUpcomingClassesData(),
-    ...getDiscoverClassesData()
-  ];
-  
-  const classData = allClasses.find(c => c.id === id);
-  
-  if (!classData) {
-    throw new Error('Class not found');
-  }
-  
-  return classData;
+export const getClassRequests = async (): Promise<ClassRequest[]> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(mockData.classRequests as ClassRequest[]);
+    }, 500);
+  });
+};
+
+export const getDiscoverClasses = async (): Promise<{[key: string]: Class[]}> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(mockData.discoverClasses as unknown as {[key: string]: Class[]});
+    }, 700);
+  });
+};
+
+export const requestClass = async (requestData: Partial<ClassRequest>): Promise<ClassRequest> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const newRequest = {
+        id: `req${Math.floor(Math.random() * 10000)}`,
+        dateRequested: new Date().toISOString(),
+        status: 'pending',
+        ...requestData
+      } as ClassRequest;
+      
+      resolve(newRequest);
+    }, 800);
+  });
+};
+
+export const getTutorClasses = async (): Promise<Class[]> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(mockData.tutorClasses as unknown as Class[]);
+    }, 500);
+  });
+};
+
+export const getTutorClassRequests = async (): Promise<ClassRequest[]> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(mockData.tutorRequests as unknown as ClassRequest[]);
+    }, 500);
+  });
 };
 
 export const createClass = async (classData: Partial<Class>): Promise<Class> => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  const classes = getUpcomingClassesData();
-  
-  const newClass = {
-    ...classData,
-    id: `class_${Date.now()}`,
-    status: 'scheduled',
-    enrolledStudents: [],
-  } as Class;
-  
-  const updatedClasses = [...classes, newClass];
-  localStorage.setItem('upcomingClasses', JSON.stringify(updatedClasses));
-  
-  return newClass;
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const newClass = {
+        id: `class${Math.floor(Math.random() * 10000)}`,
+        dateTime: new Date().toISOString(),
+        enrolledStudents: [],
+        ...classData
+      } as Class;
+      
+      resolve(newClass);
+    }, 800);
+  });
+};
+
+export const getClassById = async (classId: string): Promise<Class | null> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const classData = mockData.upcomingClasses.find(c => c.id === classId) || 
+                       Object.values(mockData.discoverClasses)
+                         .flat()
+                         .find(c => c.id === classId);
+      
+      resolve(classData as Class || null);
+    }, 300);
+  });
 };
 
 export const enrollInClass = async (classId: string, userId: string): Promise<any> => {
@@ -279,20 +314,20 @@ export const enrollInClass = async (classId: string, userId: string): Promise<an
   }
   
   // Avoid duplicate enrollment
-  if (!classes[classIndex].enrolledStudents.includes(userId)) {
-    classes[classIndex].enrolledStudents.push(userId);
+  const userAlreadyEnrolled = classes[classIndex].enrolledStudents.some(student => student.id === userId);
+  if (!userAlreadyEnrolled) {
+    // Create a proper student object with the required fields
+    const studentObj = { 
+      id: userId, 
+      firstName: "Student", // These would come from your user service in a real app
+      lastName: "User" 
+    };
+    classes[classIndex].enrolledStudents.push(studentObj);
   }
   
   localStorage.setItem('upcomingClasses', JSON.stringify(classes));
   
   return classes[classIndex];
-};
-
-export const getClassRequests = async (): Promise<ClassRequest[]> => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  return getClassRequestsData();
 };
 
 export const createClassRequest = async (requestData: Partial<ClassRequest>): Promise<ClassRequest> => {
@@ -305,7 +340,7 @@ export const createClassRequest = async (requestData: Partial<ClassRequest>): Pr
     ...requestData,
     id: `request_${Date.now()}`,
     requestedBy: requestData.requestedBy || [],
-    dateRequested: new Date(),
+    dateRequested: new Date().toISOString(),
     studentsRequested: requestData.requestedBy ? requestData.requestedBy.length : 0
   } as ClassRequest;
   
@@ -313,44 +348,6 @@ export const createClassRequest = async (requestData: Partial<ClassRequest>): Pr
   localStorage.setItem('classRequests', JSON.stringify(updatedRequests));
   
   return newRequest;
-};
-
-export const requestClass = async (
-  classRequestId: string, 
-  userId: string
-): Promise<any> => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  const requests = getClassRequestsData();
-  
-  const requestIndex = requests.findIndex(r => r.id === classRequestId);
-  if (requestIndex === -1) {
-    throw new Error('Class request not found');
-  }
-  
-  // Avoid duplicate requests
-  if (!requests[requestIndex].requestedBy.includes(userId)) {
-    requests[requestIndex].requestedBy.push(userId);
-    requests[requestIndex].studentsRequested = requests[requestIndex].requestedBy.length;
-  }
-  
-  localStorage.setItem('classRequests', JSON.stringify(requests));
-  
-  return requests[requestIndex];
-};
-
-export const getDiscoverClasses = async (subjects?: string[]): Promise<Class[]> => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  const classes = getDiscoverClassesData();
-  
-  if (subjects && subjects.length > 0) {
-    return classes.filter(c => subjects.includes(c.subject.id));
-  }
-  
-  return classes;
 };
 
 export const getReviewsForTutor = async (tutorId: string): Promise<any[]> => {
@@ -422,6 +419,6 @@ export const searchClasses = async (query: string): Promise<Class[]> => {
     c.title.toLowerCase().includes(lowercaseQuery) ||
     c.description.toLowerCase().includes(lowercaseQuery) ||
     c.subject.name.toLowerCase().includes(lowercaseQuery) ||
-    c.topic.toLowerCase().includes(lowercaseQuery)
+    (c.topic ? c.topic.toLowerCase().includes(lowercaseQuery) : false)
   );
 };

@@ -1,21 +1,28 @@
 // src/App.tsx
 import React from 'react';
-import { RouterProvider } from 'react-router-dom';
-import { router } from './router';
-import { AuthProvider } from './contexts/AuthContext';
-import { UserRoleProvider } from './contexts/UserRoleContext';
-import ErrorBoundary from './components/common/ErrorBoundary';
-import './styles/globals.css';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import StudentHome from './pages/Home/StudentHome';
+import TutorHome from './pages/Home/TutorHome';
+import './App.css';
 
 const App: React.FC = () => {
   return (
-    <ErrorBoundary>
-      <AuthProvider>
-        <UserRoleProvider>
-          <RouterProvider router={router} />
-        </UserRoleProvider>
-      </AuthProvider>
-    </ErrorBoundary>
+    <BrowserRouter>
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white shadow-sm">
+          <div className="max-w-7xl mx-auto px-4 py-4">
+            <h1 className="text-xl font-bold text-indigo-600">TeachConnect</h1>
+          </div>
+        </header>
+        <main className="py-10">
+          <Routes>
+            <Route path="/student" element={<StudentHome />} />
+            <Route path="/tutor" element={<TutorHome />} />
+            <Route path="/" element={<StudentHome />} />
+          </Routes>
+        </main>
+      </div>
+    </BrowserRouter>
   );
 };
 

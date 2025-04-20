@@ -5,7 +5,7 @@ import Button from '../common/Button';
 import Input from '../common/Input';
 
 const LoginForm: React.FC = () => {
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -18,13 +18,17 @@ const LoginForm: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const user = await login(email, password);
+      const success = await login(email, password);
       
-      // Check if user has completed their profile
-      if (user.role === 'student' || user.role === 'both') {
-        navigate('/home');
-      } else if (user.role === 'tutor') {
-        navigate('/home');
+      if (success && user) {
+        // Check if user has completed their profile
+        if (user.role === 'student' || user.role === 'both') {
+          navigate('/student');
+        } else if (user.role === 'tutor') {
+          navigate('/tutor');
+        }
+      } else {
+        setError('Invalid email or password. Please try again.');
       }
     } catch (err) {
       setError('Invalid email or password. Please try again.');

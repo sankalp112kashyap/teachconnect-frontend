@@ -19,7 +19,11 @@ const StudentHome: React.FC = () => {
   
   const [upcomingClasses, setUpcomingClasses] = useState<Class[]>([]);
   const [classRequests, setClassRequests] = useState<ClassRequest[]>([]);
-  const [discoverClasses, setDiscoverClasses] = useState<Class[]>([]);
+  const [discoverSections, setDiscoverSections] = useState<{
+    id: string;
+    name: string;
+    classes: Class[];
+  }[]>([]);
   const [loading, setLoading] = useState({
     upcoming: true,
     requests: true,
@@ -27,24 +31,46 @@ const StudentHome: React.FC = () => {
   });
   const [error, setError] = useState<string | null>(null);
 
-  // Mock data groupings for discover section
-  const [discoverSections, setDiscoverSections] = useState<{
-    id: string;
-    name: string;
-    classes: Class[];
-  }[]>([
-    { id: 'mathematics', name: 'Mathematics', classes: [] },
-    { id: 'computer_science', name: 'Computer Science', classes: [] },
-  ]);
-
   useEffect(() => {
-    // Same initialization code as before...
-    
-    // Fetch data code...
+    const fetchData = async () => {
+      try {
+        // Fetch upcoming classes
+        setLoading(prev => ({ ...prev, upcoming: true }));
+        const classesData = await getUpcomingClasses();
+        setUpcomingClasses(classesData);
+        setLoading(prev => ({ ...prev, upcoming: false }));
 
-    // Uncomment to fetch actual data from API
-    // fetchData();
-  }, [user]);
+        // Fetch class requests
+        setLoading(prev => ({ ...prev, requests: true }));
+        const requestsData = await getClassRequests();
+        setClassRequests(requestsData);
+        setLoading(prev => ({ ...prev, requests: false }));
+
+        // Fetch discover classes
+        setLoading(prev => ({ ...prev, discover: true }));
+        const discoverData = await getDiscoverClasses();
+        
+        // Convert discover classes object to sections array
+        const sectionsArray = Object.entries(discoverData).map(([key, classes]) => ({
+          id: key,
+          name: key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' '),
+          classes
+        }));
+        
+        setDiscoverSections(sectionsArray);
+        setLoading(prev => ({ ...prev, discover: false }));
+      } catch (err) {
+        setError('Failed to load data. Please try again later.');
+        setLoading({
+          upcoming: false,
+          requests: false,
+          discover: false,
+        });
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleRequestClass = () => {
     navigate('/request-class');
@@ -79,7 +105,7 @@ const StudentHome: React.FC = () => {
                 description={classItem.description}
                 instructor={`${classItem.tutor.firstName} ${classItem.tutor.lastName}`}
                 schedule={new Date(classItem.dateTime).toLocaleString()}
-                capacity={30} // Mock value
+                capacity={classItem.capacity}
                 enrolled={classItem.enrolledStudents.length}
                 onEnroll={() => navigate(`/class/${classItem.id}`)}
               />
@@ -96,50 +122,49 @@ const StudentHome: React.FC = () => {
       </section>
       
       {/* Requested Classes Section */}
-{/* Requested Classes Section */}
-<section className="mb-12">
-  <div className="flex justify-between items-center mb-6">
-    <h2 className="text-2xl font-bold text-gray-900">Requested Classes</h2>
-    <Button
-      variant="success"
-      size="sm"
-      onClick={handleRequestClass}
-    >
-      + Request a New Class
-    </Button>
-  </div>
-  
-  {loading.requests ? (
-    <div className="flex justify-center items-center h-64">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
-    </div>
-  ) : classRequests.length > 0 ? (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {classRequests.map((requestItem) => (
-        <ClassRequestCard
-          key={requestItem.id}
-          request={{
-            id: requestItem.id,
-            studentName: user ? `${user.firstName} ${user.lastName}` : "Student",
-            studentEmail: user ? user.email : "student@example.com",
-            className: requestItem.topic,
-            requestDate: new Date(requestItem.dateRequested).toISOString(),
-            status: "pending"
-          }}
-          onApprove={() => {}} // Add empty function
-          onReject={() => {}} // Add empty function
-        />
-      ))}
-    </div>
-  ) : (
-    <div className="bg-white p-6 rounded-lg border border-gray-200 text-center">
-      <p className="text-gray-600">No class requests available.</p>
-      <p className="text-gray-600 mt-2">
-        Be the first to request a class on a topic you're interested in!
-      </p>
-    </div>
-  )}
-</section>
+      <section className="mb-12">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">Requested Classes</h2>
+          <Button
+            variant="success"
+            size="sm"
+            onClick={handleRequestClass}
+          >
+            + Request a New Class
+          </Button>
+        </div>
+        
+        {loading.requests ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+          </div>
+        ) : classRequests.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {classRequests.map((requestItem) => (
+              <ClassRequestCard
+                key={requestItem.id}
+                request={{
+                  id: requestItem.id,
+                  studentName: user ? `${user.firstName} ${user.lastName}` : "Student",
+                  studentEmail: user ? user.email : "student@example.com",
+                  className: requestItem.topic || "",
+                  requestDate: requestItem.dateRequested,
+                  status: requestItem.status
+                }}
+                onApprove={() => {}} // Add empty function
+                onReject={() => {}} // Add empty function
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="bg-white p-6 rounded-lg border border-gray-200 text-center">
+            <p className="text-gray-600">No class requests available.</p>
+            <p className="text-gray-600 mt-2">
+              Be the first to request a class on a topic you're interested in!
+            </p>
+          </div>
+        )}
+      </section>
       
       {/* Discover Section */}
       <section>
@@ -165,11 +190,11 @@ const StudentHome: React.FC = () => {
                           description: classItem.description,
                           instructor: `${classItem.tutor.firstName} ${classItem.tutor.lastName}`,
                           subject: classItem.subject.name,
-                          level: "Intermediate", // Default value
-                          imageUrl: undefined,
+                          level: classItem.level,
+                          imageUrl: classItem.imageUrl,
                           rating: classItem.tutor.rating,
-                          reviewCount: 10, // Default value
-                          price: 49.99 // Default value
+                          reviewCount: classItem.reviewCount || 0,
+                          price: classItem.price || 0
                         }}
                         onViewDetails={(id) => navigate(`/class/${id}`)}
                       />

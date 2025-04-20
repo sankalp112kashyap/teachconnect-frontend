@@ -26,10 +26,10 @@ const ProtectedRoute: React.FC<{
   element: React.ReactElement; 
   requiredRole?: 'student' | 'tutor' | null;
 }> = ({ element, requiredRole }) => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const { activeRole } = useUserRole();
   
-  if (isLoading) {
+  if (loading) {
     return <div>Loading...</div>;
   }
   
