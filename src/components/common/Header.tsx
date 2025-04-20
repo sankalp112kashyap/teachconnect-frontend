@@ -1,3 +1,4 @@
+// src/components/common/Header.tsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
@@ -6,7 +7,11 @@ import Button from './Button';
 import UserProfileMenu from './UserProfileMenu';
 import SearchBar from '../search/searchBar';
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  showSearch?: boolean;
+}
+
+const Header: React.FC<HeaderProps> = ({ showSearch = true }) => {
   const { isAuthenticated } = useAuth();
   const { activeRole, setActiveRole, availableRoles } = useUserRole();
   const navigate = useNavigate();
@@ -23,13 +28,16 @@ const Header: React.FC = () => {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <Link to="/" className="text-xl font-bold text-indigo-600">
-              TeachConnect
+              Teachsy
             </Link>
           </div>
 
-          <div className="flex-1 max-w-lg mx-8">
-            <SearchBar onSearch={handleSearch} />
-          </div>
+          {/* Only show search when authenticated and showSearch is true */}
+          {isAuthenticated && showSearch && (
+            <div className="flex-1 max-w-lg mx-8">
+              <SearchBar onSearch={handleSearch} />
+            </div>
+          )}
 
           <div className="flex items-center space-x-4">
             {isAuthenticated ? (

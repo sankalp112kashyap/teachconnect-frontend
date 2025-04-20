@@ -2,10 +2,13 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Header from '../components/common/Header';
+import { useAuth } from 'hooks/useAuth';
 
 const MainLayout: React.FC = () => {
+  // const { isAuthenticated } = useAuth();
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* <Header showSearch={isAuthenticated} /> */}
       <Header />
       <main className="py-6">
         <Outlet />
@@ -14,7 +17,7 @@ const MainLayout: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between">
             <div className="mb-4 md:mb-0">
-              <h3 className="text-lg font-semibold text-indigo-600">TeachConnect</h3>
+              <h3 className="text-lg font-semibold text-indigo-600">Teachsy</h3>
               <p className="mt-2 text-sm text-gray-500">
                 Connecting passionate teachers with eager students.
               </p>
@@ -125,7 +128,7 @@ const MainLayout: React.FC = () => {
           </div>
           <div className="mt-8 border-t border-gray-200 pt-8">
             <p className="text-sm text-gray-500 text-center">
-              &copy; {new Date().getFullYear()} TeachConnect. All rights reserved.
+              &copy; {new Date().getFullYear()} Teachsy. All rights reserved.
             </p>
           </div>
         </div>
