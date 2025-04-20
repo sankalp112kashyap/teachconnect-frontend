@@ -3,14 +3,16 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   getUpcomingClasses, 
-  getClassRequests
+  getClassRequests, 
+  createClass
 } from '../../services/class.service';
 import { useAuth } from '../../hooks/useAuth';
 import Button from '../../components/common/Button';
 import ClassCard from '../../components/class/ClassCard';
 import ClassRequestCard from '../../components/class/ClassRequestCard';
-import ClassCreateForm from '../../components/class/ClassCreateForm';
+import ClassCreateModal from '../../components/class/ClassCreateModal';
 import { Class, ClassRequest } from '../../models/class';
+import { mockTutorClasses, mockStudentRequests } from '../../mockData';
 
 const TutorHome: React.FC = () => {
   const { user } = useAuth();
@@ -24,132 +26,83 @@ const TutorHome: React.FC = () => {
   });
   const [error, setError] = useState<string | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState<{
-    id: string;
-    subject: string;
-    topic: string;
-  } | null>(null);
+  const [initialFormData, setInitialFormData] = useState<{
+    subject?: string;
+    topic?: string;
+    level?: string;
+  } | undefined>(undefined);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!user) return;
-
-      try {
-        // Fetch upcoming classes
-        const upcomingData = await getUpcomingClasses(user.id);
-        setUpcomingClasses(upcomingData);
-        setLoading(prev => ({ ...prev, upcoming: false }));
-
-        // Fetch class requests
-        const requestsData = await getClassRequests();
-        setClassRequests(requestsData);
-        setLoading(prev => ({ ...prev, requests: false }));
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setError('Failed to load data. Please try again later.');
-        setLoading({
-          upcoming: false,
-          requests: false,
-        });
-      }
-    };
-
-    // Use mock data for development
-    setUpcomingClasses([
-      {
-        id: '1',
-        subject: { id: 'mathematics', name: 'MATHEMATICS', color: 'indigo-600', topics: [], level: [] },
-        topic: 'Introduction to Derivatives',
-        title: 'Introduction to Derivatives',
-        description: 'Understanding the concept of limits and the formal definition of a derivative. Basic differentiation rules and applications.',
-        tutor: {
-          id: 'tutor1',
-          firstName: 'Evelyn',
-          lastName: 'Reed',
-          profilePicture: undefined,
-          rating: 4.9,
-        },
-        dateTime: new Date('2025-04-21T11:00:00'),
-        duration: 60,
-        status: 'scheduled',
-        enrolledStudents: ['student1'],
-      },
-      {
-        id: '3',
-        subject: { id: 'physics', name: 'PHYSICS', color: 'indigo-600', topics: [], level: [] },
-        topic: 'Newton\'s Laws of Motion',
-        title: 'Newton\'s Laws of Motion',
-        description: 'Exploring inertia, force, acceleration, and action-reaction through examples and demonstrations.',
-        tutor: {
-          id: 'tutor3',
-          firstName: 'Anita',
-          lastName: 'Sharma',
-          profilePicture: undefined,
-          rating: 5.0,
-        },
-        dateTime: new Date('2025-04-23T09:00:00'),
-        duration: 60,
-        status: 'scheduled',
-        enrolledStudents: ['student1'],
-      },
-    ]);
-
-    setClassRequests([
-      {
-        id: '1',
-        subject: { id: 'computer_science', name: 'COMPUTER SCIENCE', color: 'green-600', topics: [], level: [] },
-        topic: 'Understanding Recursion',
-        requestedBy: [],
-        dateRequested: new Date('2025-04-18'),
-        studentsRequested: 7,
-      },
-      {
-        id: '2',
-        subject: { id: 'chemistry', name: 'CHEMISTRY', color: 'green-600', topics: [], level: [] },
-        topic: 'Organic Reaction Mechanisms',
-        requestedBy: [],
-        dateRequested: new Date('2025-04-17'),
-        studentsRequested: 12,
-      },
-      {
-        id: '3',
-        subject: { id: 'philosophy', name: 'PHILOSOPHY', color: 'green-600', topics: [], level: [] },
-        topic: 'Introduction to Ethics',
-        requestedBy: [],
-        dateRequested: new Date('2025-04-19'),
-        studentsRequested: 3,
-      },
-    ]);
-
+    // Set mock data instead of calling APIs
+    setUpcomingClasses(mockTutorClasses || []);
+    setClassRequests(mockStudentRequests || []);
+    
     setLoading({
       upcoming: false,
       requests: false,
     });
-
-    // Uncomment to fetch actual data from API
+    
+    // Uncomment when backend is ready
     // fetchData();
   }, [user]);
 
   const handleCreateClass = () => {
-    setSelectedRequest(null);
+    setInitialFormData(undefined);
     setIsCreateModalOpen(true);
   };
 
   const handleCreateFromRequest = (requestId: string) => {
     const request = classRequests.find((req) => req.id === requestId);
     if (request) {
-      setSelectedRequest({
-        id: request.id,
+      setInitialFormData({
         subject: request.subject.id,
         topic: request.topic,
+        level: 'undergraduate', // Default level, would come from request in real app
       });
       setIsCreateModalOpen(true);
     }
   };
 
-  const handleCloseModal = () => {
-    setIsCreateModalOpen(false);
-    setSelectedRequest(null);
+  const handleSubmitClass = async (classData: any) => {
+    try {
+      if (user) {
+        const newClass = {
+          ...classData,
+          tutor: {
+            id: user.id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            profilePicture: user.profilePicture,
+            rating: 5.0, // Default rating for new tutors
+          },
+          status: 'scheduled',
+          enrolledStudents: [],
+        };
+        
+        // In a real app, this would call your API
+        console.log('Creating class:', newClass);
+        // const createdClass = await createClass(newClass);
+        
+        // For now, just add it to the state
+        setUpcomingClasses(prev => [
+          ...prev, 
+          { 
+            ...newClass, 
+            id: `class_${Date.now()}`,
+            subject: { 
+              id: classData.subject, 
+              name: classData.subject.toUpperCase(), 
+              color: 'indigo-600', 
+              topics: [], 
+              level: [] 
+            },
+            dateTime: new Date(classData.dateTime),
+          } as Class
+        ]);
+      }
+    } catch (error) {
+      console.error('Failed to create class:', error);
+    }
   };
 
   const handleManageClass = (classId: string) => {
@@ -191,11 +144,12 @@ const TutorHome: React.FC = () => {
                 key={classItem.id}
                 title={classItem.title}
                 description={classItem.description}
-                instructor={`${classItem.tutor.firstName} ${classItem.tutor.lastName}`}
                 schedule={new Date(classItem.dateTime).toLocaleString()}
                 capacity={30} // Mock value
                 enrolled={classItem.enrolledStudents.length}
                 onEnroll={() => handleManageClass(classItem.id)}
+                buttonText="Manage Class"
+                isInstructorView={true}
               />
             ))}
           </div>
@@ -222,16 +176,9 @@ const TutorHome: React.FC = () => {
             {classRequests.map((request) => (
               <ClassRequestCard
                 key={request.id}
-                request={{
-                  id: request.id,
-                  studentName: "Student", // Mock value
-                  studentEmail: "student@example.com", // Mock value
-                  className: request.topic,
-                  requestDate: new Date(request.dateRequested).toLocaleDateString(),
-                  status: "pending" as "pending" | "approved" | "rejected"
-                }}
-                onApprove={() => handleCreateFromRequest(request.id)}
-                onReject={() => console.log('Reject request:', request.id)}
+                classRequest={request}
+                tutorView={true}
+                onCreateClass={handleCreateFromRequest}
               />
             ))}
           </div>
@@ -245,12 +192,12 @@ const TutorHome: React.FC = () => {
         )}
       </section>
       
-      {/* Create Class Modal */}
-      <ClassCreateForm
-        onSubmit={(classData) => {
-          console.log('Creating class:', classData);
-          handleCloseModal();
-        }}
+      {/* Class Creation Modal */}
+      <ClassCreateModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        initialData={initialFormData}
+        onSubmit={handleSubmitClass}
       />
     </div>
   );

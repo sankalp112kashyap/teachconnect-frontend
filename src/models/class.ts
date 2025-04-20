@@ -26,6 +26,7 @@ export interface Class {
     requestedBy: string[];
     dateRequested: Date;
     studentsRequested: number;
+    level?: string;
   }
   
   export type ClassStatus = 'scheduled' | 'ongoing' | 'completed' | 'cancelled';

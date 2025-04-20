@@ -11,7 +11,6 @@ interface DiscoverClassCardProps {
     imageUrl?: string;
     rating: number;
     reviewCount: number;
-    price: number;
   };
   onViewDetails: (id: string) => void;
 }
@@ -70,7 +69,7 @@ const DiscoverClassCard: React.FC<DiscoverClassCardProps> = ({
         </div>
         
         <div className="flex justify-between items-center">
-          <span className="text-xl font-bold">${classData.price.toFixed(2)}</span>
+          {/* <span className="text-xl font-bold">${classData.price.toFixed(2)}</span> */}
           <button 
             onClick={() => onViewDetails(classData.id)}
             className="bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"

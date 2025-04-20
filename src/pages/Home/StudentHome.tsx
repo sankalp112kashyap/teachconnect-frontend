@@ -12,12 +12,15 @@ import ClassCard from '../../components/class/ClassCard';
 import ClassRequestCard from '../../components/class/ClassRequestCard';
 import DiscoverClassCard from '../../components/class/DiscoverClassCard';
 import { Class, ClassRequest } from '../../models/class';
+
+
 import { 
     mockUpcomingClasses, 
     mockClassRequests, 
     mockMathClasses, 
     mockCSClasses 
   } from '../../mockData';
+import ClassRequestModal from '../../components/class/ClassRequestModal';
   
 const StudentHome: React.FC = () => {
   const { user } = useAuth();
@@ -26,6 +29,8 @@ const StudentHome: React.FC = () => {
   const [upcomingClasses, setUpcomingClasses] = useState<Class[]>([]);
   const [classRequests, setClassRequests] = useState<ClassRequest[]>([]);
   const [discoverClasses, setDiscoverClasses] = useState<Class[]>([]);
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+
   const [loading, setLoading] = useState({
     upcoming: true,
     requests: true,
@@ -64,15 +69,27 @@ const StudentHome: React.FC = () => {
     // fetchData();
   }, [user]);
   const handleRequestClass = () => {
-    navigate('/request-class');
+    setIsRequestModalOpen(true);
   };
-
+// In StudentHome.tsx
+const handleRequestSuccess = (newRequest: any) => {
+    // Add the new request to the list of class requests
+    setClassRequests(prev => [newRequest, ...prev]);
+    
+    // Optional: Show a success message or notification
+    console.log('Class request submitted successfully');
+  };
   if (error) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           <p>{error}</p>
         </div>
+        <ClassRequestModal
+            isOpen={isRequestModalOpen}
+            onClose={() => setIsRequestModalOpen(false)}
+            onSuccess={handleRequestSuccess}
+            />
       </div>
     );
   }
@@ -80,39 +97,41 @@ const StudentHome: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Upcoming Classes Section */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Upcoming Classes</h2>
-        
-        {loading.upcoming ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
-          </div>
-        ) : upcomingClasses.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {upcomingClasses.map((classItem) => (
-              <ClassCard
-                key={classItem.id}
-                title={classItem.title}
-                description={classItem.description}
-                instructor={`${classItem.tutor.firstName} ${classItem.tutor.lastName}`}
-                schedule={new Date(classItem.dateTime).toLocaleString()}
-                capacity={30} // Mock value
-                enrolled={classItem.enrolledStudents.length}
-                onEnroll={() => navigate(`/class/${classItem.id}`)}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="bg-white p-6 rounded-lg border border-gray-200 text-center">
-            <p className="text-gray-600">You haven't enrolled in any classes yet.</p>
-            <p className="text-gray-600 mt-2">
-              Explore the Discover section below to find classes that interest you.
-            </p>
-          </div>
-        )}
-      </section>
-      
+    <section className="mb-12">
+    <h2 className="text-2xl font-bold text-gray-900 mb-6">My Upcoming Classes</h2>
+    
+    {loading.upcoming ? (
+        <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+        </div>
+    ) : upcomingClasses.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {upcomingClasses.map((classItem) => (
+            <ClassCard
+            key={classItem.id}
+            title={classItem.title}
+            description={classItem.description}
+            instructor={`${classItem.tutor.firstName} ${classItem.tutor.lastName}`}
+            schedule={new Date(classItem.dateTime).toLocaleString()}
+            capacity={30} // Mock value
+            enrolled={classItem.enrolledStudents.length}
+            onEnroll={() => navigate(`/class/${classItem.id}`)}
+            buttonText="View Details" // Change button text to "View Details" instead of "Enroll Now"
+            isInstructorView={false}
+            />
+        ))}
+        </div>
+    ) : (
+        <div className="bg-white p-6 rounded-lg border border-gray-200 text-center">
+        <p className="text-gray-600">You haven't enrolled in any classes yet.</p>
+        <p className="text-gray-600 mt-2">
+            Explore the Discover section below to find classes that interest you.
+        </p>
+        </div>
+    )}
+    </section>
       {/* Requested Classes Section */}
+{/* Requested Classes Section */}
 {/* Requested Classes Section */}
 <section className="mb-12">
   <div className="flex justify-between items-center mb-6">
@@ -135,16 +154,9 @@ const StudentHome: React.FC = () => {
       {classRequests.map((requestItem) => (
         <ClassRequestCard
           key={requestItem.id}
-          request={{
-            id: requestItem.id,
-            studentName: user ? `${user.firstName} ${user.lastName}` : "Student",
-            studentEmail: user ? user.email : "student@example.com",
-            className: requestItem.topic,
-            requestDate: new Date(requestItem.dateRequested).toISOString(),
-            status: "pending"
-          }}
-          onApprove={() => {}} // Add empty function
-          onReject={() => {}} // Add empty function
+          classRequest={requestItem}
+          tutorView={false}
+          onCreateClass={() => {}} // Empty function since students don't create classes
         />
       ))}
     </div>
@@ -186,7 +198,7 @@ const StudentHome: React.FC = () => {
                           imageUrl: undefined,
                           rating: classItem.tutor.rating,
                           reviewCount: 10, // Default value
-                          price: 49.99 // Default value
+                           // Default value
                         }}
                         onViewDetails={(id) => navigate(`/class/${id}`)}
                       />
@@ -205,6 +217,11 @@ const StudentHome: React.FC = () => {
           </div>
         )}
       </section>
+      <ClassRequestModal
+      isOpen={isRequestModalOpen}
+      onClose={() => setIsRequestModalOpen(false)}
+      onSuccess={handleRequestSuccess}
+    />
     </div>
   );
 };

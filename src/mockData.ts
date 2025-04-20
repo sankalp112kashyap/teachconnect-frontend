@@ -68,7 +68,7 @@ export const mockClassRequests: ClassRequest[] = [
     topic: 'Understanding Recursion',
     requestedBy: [],
     dateRequested: new Date('2025-04-18'),
-    studentsRequested: 7,
+    studentsRequested: 22,
   },
   {
     id: '2',
@@ -84,7 +84,7 @@ export const mockClassRequests: ClassRequest[] = [
     topic: 'Introduction to Ethics',
     requestedBy: [],
     dateRequested: new Date('2025-04-19'),
-    studentsRequested: 3,
+    studentsRequested: 32,
   },
 ];
 
@@ -151,8 +151,8 @@ export const mockCSClasses: Class[] = [
   {
     id: '7',
     subject: { id: 'computer_science', name: 'COMPUTER SCIENCE', color: 'indigo-600', topics: [], level: [] },
-    topic: 'Intro to Operating Systems',
-    title: 'Intro to Operating Systems',
+    topic: 'Operating Systems',
+    title: 'Operating Systems',
     description: 'Core concepts: processes, threads, memory management, and concurrency. Understanding how modern operating systems work.',
     tutor: {
       id: 'tutor1',
@@ -234,4 +234,24 @@ export const mockStudentRequests: ClassRequest[] = [
     dateRequested: new Date('2025-04-18'),
     studentsRequested: 5,
   },
+];
+
+// Mock users
+export const users = [
+  {
+    id: 'student1',
+    firstName: 'John',
+    lastName: 'Doe',
+    email: 'student@example.com',
+    role: 'student'
+  },
+  {
+    id: 'tutor1',
+    firstName: 'Evelyn',
+    lastName: 'Reed',
+    email: 'tutor@example.com',
+    profilePicture: undefined,
+    rating: 4.9,
+    role: 'tutor'
+  }
 ];
