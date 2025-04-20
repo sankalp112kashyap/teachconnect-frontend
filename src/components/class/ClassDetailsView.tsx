@@ -1,15 +1,4 @@
 import React from 'react';
-import { 
-  Box, 
-  Typography, 
-  Paper, 
-  Grid, 
-  List, 
-  ListItem, 
-  ListItemText,
-  Divider,
-  Button
-} from '@mui/material';
 
 interface ClassDetailsViewProps {
   classData: {
@@ -30,112 +19,113 @@ interface ClassDetailsViewProps {
 
 const ClassDetailsView: React.FC<ClassDetailsViewProps> = ({ classData, onEnroll }) => {
   return (
-    <Paper sx={{ p: 3, maxWidth: 800, mx: 'auto', my: 2 }}>
-      <Typography variant="h4" gutterBottom>
+    <div className="bg-white p-6 max-w-3xl mx-auto my-4 rounded-lg shadow-md">
+      <h1 className="text-2xl font-bold mb-4">
         {classData.title}
-      </Typography>
+      </h1>
       
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={8}>
-          <Typography variant="h6" gutterBottom>
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        <div className="md:col-span-8">
+          <h2 className="text-xl font-semibold mb-2">
             About this Class
-          </Typography>
-          <Typography paragraph>
+          </h2>
+          <p className="mb-6">
             {classData.description}
-          </Typography>
+          </p>
           
-          <Box sx={{ my: 2 }}>
-            <Typography variant="h6" gutterBottom>
+          <div className="my-4">
+            <h2 className="text-xl font-semibold mb-2">
               Class Information
-            </Typography>
-            <List>
-              <ListItem>
-                <ListItemText 
-                  primary="Instructor" 
-                  secondary={classData.instructor}
-                />
-              </ListItem>
-              <ListItem>
-                <ListItemText 
-                  primary="Schedule" 
-                  secondary={classData.schedule}
-                />
-              </ListItem>
-              <ListItem>
-                <ListItemText 
-                  primary="Subject" 
-                  secondary={classData.subject}
-                />
-              </ListItem>
-              <ListItem>
-                <ListItemText 
-                  primary="Level" 
-                  secondary={classData.level}
-                />
-              </ListItem>
-              <ListItem>
-                <ListItemText 
-                  primary="Enrollment" 
-                  secondary={`${classData.enrolled}/${classData.capacity} students`}
-                />
-              </ListItem>
-            </List>
-          </Box>
-        </Grid>
+            </h2>
+            <ul className="divide-y divide-gray-200">
+              <li className="py-2">
+                <div>
+                  <span className="font-medium">Instructor</span>
+                  <p className="text-gray-600">{classData.instructor}</p>
+                </div>
+              </li>
+              <li className="py-2">
+                <div>
+                  <span className="font-medium">Schedule</span>
+                  <p className="text-gray-600">{classData.schedule}</p>
+                </div>
+              </li>
+              <li className="py-2">
+                <div>
+                  <span className="font-medium">Subject</span>
+                  <p className="text-gray-600">{classData.subject}</p>
+                </div>
+              </li>
+              <li className="py-2">
+                <div>
+                  <span className="font-medium">Level</span>
+                  <p className="text-gray-600">{classData.level}</p>
+                </div>
+              </li>
+              <li className="py-2">
+                <div>
+                  <span className="font-medium">Enrollment</span>
+                  <p className="text-gray-600">{`${classData.enrolled}/${classData.capacity} students`}</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
         
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 2, bgcolor: 'background.default' }}>
-            <Typography variant="h6" gutterBottom>
+        <div className="md:col-span-4">
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h2 className="text-xl font-semibold mb-2">
               Enrollment Status
-            </Typography>
-            <Typography variant="body1" paragraph>
+            </h2>
+            <p className="mb-4">
               {classData.enrolled >= classData.capacity 
                 ? 'Class is full' 
                 : `${classData.capacity - classData.enrolled} spots remaining`}
-            </Typography>
-            <Button
-              variant="contained"
-              color="primary"
-              fullWidth
+            </p>
+            <button
+              className={`w-full py-2 px-4 rounded-md text-white font-medium 
+                ${classData.enrolled >= classData.capacity 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-indigo-600 hover:bg-indigo-700'}`}
               onClick={onEnroll}
               disabled={classData.enrolled >= classData.capacity}
             >
               {classData.enrolled >= classData.capacity ? 'Class Full' : 'Enroll Now'}
-            </Button>
-          </Paper>
-        </Grid>
-      </Grid>
+            </button>
+          </div>
+        </div>
+      </div>
 
       {classData.prerequisites && classData.prerequisites.length > 0 && (
-        <Box sx={{ mt: 3 }}>
-          <Typography variant="h6" gutterBottom>
+        <div className="mt-6">
+          <h2 className="text-xl font-semibold mb-2">
             Prerequisites
-          </Typography>
-          <List>
+          </h2>
+          <ul className="list-disc pl-5">
             {classData.prerequisites.map((prereq, index) => (
-              <ListItem key={index}>
-                <ListItemText primary={prereq} />
-              </ListItem>
+              <li key={index} className="py-1">
+                {prereq}
+              </li>
             ))}
-          </List>
-        </Box>
+          </ul>
+        </div>
       )}
 
       {classData.materials && classData.materials.length > 0 && (
-        <Box sx={{ mt: 3 }}>
-          <Typography variant="h6" gutterBottom>
+        <div className="mt-6">
+          <h2 className="text-xl font-semibold mb-2">
             Required Materials
-          </Typography>
-          <List>
+          </h2>
+          <ul className="list-disc pl-5">
             {classData.materials.map((material, index) => (
-              <ListItem key={index}>
-                <ListItemText primary={material} />
-              </ListItem>
+              <li key={index} className="py-1">
+                {material}
+              </li>
             ))}
-          </List>
-        </Box>
+          </ul>
+        </div>
       )}
-    </Paper>
+    </div>
   );
 };
 

@@ -1,66 +1,79 @@
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+// src/services/api.ts
+// Mock API client that uses localStorage instead of real API calls
 
-// Helper for handling HTTP errors
-const handleResponse = async (response: Response) => {
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => null);
-    const error = new Error(
-      errorData?.message || `API error: ${response.status} ${response.statusText}`
-    );
-    throw error;
-  }
-  return response.json();
-};
-
-// Base API client with common configuration
 export const apiClient = {
   get: async (path: string) => {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`${API_URL}${path}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-    });
-    return handleResponse(response);
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // Extract the key from the path
+    const key = path.split('/').pop() || '';
+    
+    const data = localStorage.getItem(key);
+    if (!data) {
+      return { data: [] };
+    }
+    
+    return JSON.parse(data);
   },
 
   post: async (path: string, data: any) => {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`${API_URL}${path}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: JSON.stringify(data),
-    });
-    return handleResponse(response);
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // Extract the key from the path
+    const key = path.split('/').pop() || '';
+    
+    // If there's existing data, append to it
+    const existingData = localStorage.getItem(key);
+    let newData;
+    
+    if (existingData) {
+      const parsed = JSON.parse(existingData);
+      if (Array.isArray(parsed)) {
+        // Add ID if it doesn't exist
+        if (!data.id) {
+          data.id = `${key}_${Date.now()}`;
+        }
+        newData = [...parsed, data];
+      } else {
+        newData = { ...parsed, ...data };
+      }
+    } else {
+      if (Array.isArray(data)) {
+        newData = data;
+      } else {
+        // Add ID if it doesn't exist
+        if (!data.id) {
+          data.id = `${key}_${Date.now()}`;
+        }
+        newData = [data];
+      }
+    }
+    
+    localStorage.setItem(key, JSON.stringify(newData));
+    return data;
   },
 
   put: async (path: string, data: any) => {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`${API_URL}${path}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: JSON.stringify(data),
-    });
-    return handleResponse(response);
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // Extract the key from the path
+    const key = path.split('/').pop() || '';
+    
+    localStorage.setItem(key, JSON.stringify(data));
+    return data;
   },
 
   delete: async (path: string) => {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`${API_URL}${path}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-    });
-    return handleResponse(response);
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // Extract the key from the path
+    const key = path.split('/').pop() || '';
+    
+    localStorage.removeItem(key);
+    return { success: true };
   },
 };

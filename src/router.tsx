@@ -47,6 +47,8 @@ const ProtectedRoute: React.FC<{
 // Role-based home redirect component
 const HomeRedirect: React.FC = () => {
   const { activeRole } = useUserRole();
+  console.log(activeRole);
+  
   
   if (activeRole === 'student') {
     return <StudentHome />;
