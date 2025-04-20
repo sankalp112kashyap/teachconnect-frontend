@@ -66,7 +66,7 @@ const RegisterForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    alert('Registration form submitted');
     if (!validateForm()) {
       return;
     }

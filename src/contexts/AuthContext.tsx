@@ -1,3 +1,4 @@
+// src/contexts/AuthContext.tsx
 import React, { createContext, useEffect, useState } from 'react';
 import { User } from '../models/user';
 import { login, register, logout } from '../services/auth.service';
@@ -25,7 +26,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in (e.g., from localStorage or a token in cookies)
+    // Check if user is logged in from localStorage
     const checkAuthStatus = async () => {
       try {
         const userJson = localStorage.getItem('user');

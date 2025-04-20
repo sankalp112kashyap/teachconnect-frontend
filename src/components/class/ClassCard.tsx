@@ -1,5 +1,4 @@
 import React from 'react';
-import { Card, CardContent, Typography, Button, Box } from '@mui/material';
 
 interface ClassCardProps {
   title: string;
@@ -21,35 +20,30 @@ const ClassCard: React.FC<ClassCardProps> = ({
   onEnroll
 }) => {
   return (
-    <Card sx={{ maxWidth: 345, m: 2 }}>
-      <CardContent>
-        <Typography gutterBottom variant="h5" component="div">
-          {title}
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          {description}
-        </Typography>
-        <Box sx={{ mb: 1 }}>
-          <Typography variant="body2">
+    <div className="bg-white rounded-lg shadow-md p-6 m-2 max-w-sm">
+      <div>
+        <h2 className="text-xl font-bold mb-2">{title}</h2>
+        <p className="text-gray-600 mb-4">{description}</p>
+        <div className="mb-4">
+          <p className="text-sm mb-1">
             <strong>Instructor:</strong> {instructor}
-          </Typography>
-          <Typography variant="body2">
+          </p>
+          <p className="text-sm mb-1">
             <strong>Schedule:</strong> {schedule}
-          </Typography>
-          <Typography variant="body2">
+          </p>
+          <p className="text-sm mb-1">
             <strong>Enrollment:</strong> {enrolled}/{capacity}
-          </Typography>
-        </Box>
-        <Button 
-          variant="contained" 
-          color="primary" 
+          </p>
+        </div>
+        <button 
+          className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 disabled:bg-gray-400"
           onClick={onEnroll}
           disabled={enrolled >= capacity}
         >
           {enrolled >= capacity ? 'Class Full' : 'Enroll Now'}
-        </Button>
-      </CardContent>
-    </Card>
+        </button>
+      </div>
+    </div>
   );
 };
 
